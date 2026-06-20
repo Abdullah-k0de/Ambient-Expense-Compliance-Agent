@@ -214,7 +214,7 @@ def security_checkpoint(ctx: Context, node_input: dict):
         return Event(
             output=security_assessment,
             route="security_alert",
-            state={"security_event": True}
+            state={"security_event": True, "risk_assessment": security_assessment}
         )
         
     # Build clean string for the LLM reviewer

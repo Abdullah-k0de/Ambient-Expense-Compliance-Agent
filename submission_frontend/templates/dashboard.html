@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Approval Dashboard</title>
+  <!-- Google Fonts Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Theme variables default (Dark Mode) */
+      --bg-gradient: radial-gradient(circle at 50% 50%, #13192f 0%, #0a0f1d 100%);
+      --bg-color: #0a0f1d;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --card-bg-hover: rgba(255, 255, 255, 0.07);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --primary: #8b5cf6;
+      --primary-glow: rgba(139, 92, 246, 0.35);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.2);
+      --input-bg: rgba(255, 255, 255, 0.05);
+      --header-bg: rgba(10, 15, 29, 0.7);
+      --modal-bg: #0f172a;
+      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --badge-bg: rgba(255, 255, 255, 0.06);
+    }
+
+    body.light-mode {
+      /* Theme variables (Light Mode) */
+      --bg-gradient: radial-gradient(circle at 50% 50%, #f8fafc 0%, #e2e8f0 100%);
+      --bg-color: #f1f5f9;
+      --card-bg: rgba(15, 23, 42, 0.03);
+      --card-bg-hover: rgba(15, 23, 42, 0.06);
+      --card-border: rgba(15, 23, 42, 0.08);
+      --text-main: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --primary: #7c3aed;
+      --primary-glow: rgba(124, 58, 237, 0.15);
+      --success: #059669;
+      --success-glow: rgba(5, 150, 105, 0.15);
+      --danger: #dc2626;
+      --danger-glow: rgba(220, 38, 38, 0.15);
+      --input-bg: rgba(15, 23, 42, 0.05);
+      --header-bg: rgba(241, 245, 249, 0.7);
+      --modal-bg: #ffffff;
+      --shadow: 0 8px 32px 0 rgba(148, 163, 184, 0.2);
+      --badge-bg: rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    /* Radial glows behind dashboard elements */
+    .radial-glow {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+      z-index: 0;
+      pointer-events: none;
+      filter: blur(50px);
+    }
+
+    .radial-glow-2 {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+      bottom: -150px;
+      left: -150px;
+      z-index: 0;
+      pointer-events: none;
+      filter: blur(60px);
+    }
+
+    /* Header Styling */
+    header {
+      background: var(--header-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, #a78bfa 0%, var(--primary) 100%);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.2rem;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: linear-gradient(to right, var(--text-main), var(--text-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .theme-toggle-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 10px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--card-bg-hover);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      padding: 40px;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      z-index: 1;
+      position: relative;
+    }
+
+    .dashboard-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pending-count-badge {
+      background: var(--primary-glow);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: 1px solid var(--primary);
+    }
+
+    .refresh-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .refresh-btn:hover {
+      background: var(--card-bg-hover);
+      transform: scale(1.02);
+    }
+
+    /* Dashboard Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 25px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 380px;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      background: var(--card-bg-hover);
+      border-color: rgba(139, 92, 246, 0.4);
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Top banner showing risk tag */
+    .card-top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .session-id-tag {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: var(--badge-bg);
+      padding: 3px 8px;
+      border-radius: 6px;
+      max-width: 120px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .risk-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .risk-low {
+      background-color: var(--success-glow);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .risk-med {
+      background-color: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid #f59e0b;
+    }
+
+    .risk-high {
+      background-color: var(--danger-glow);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .expense-amount {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .expense-details {
+      margin-bottom: 20px;
+    }
+
+    .detail-item {
+      display: flex;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    .detail-label {
+      width: 100px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .detail-value {
+      flex: 1;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .expense-description {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-top: 10px;
+      background: rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      border-radius: 8px;
+      border-left: 3px solid var(--primary);
+    }
+    body.light-mode .expense-description {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .action-section {
+      display: flex;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .btn {
+      flex: 1;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .btn-approve {
+      background: var(--success);
+      color: #fff;
+      box-shadow: 0 4px 14px var(--success-glow);
+    }
+
+    .btn-approve:hover {
+      background: #059669;
+      transform: scale(1.03);
+    }
+
+    .btn-reject {
+      background: var(--danger);
+      color: #fff;
+      box-shadow: 0 4px 14px var(--danger-glow);
+    }
+
+    .btn-reject:hover {
+      background: #dc2626;
+      transform: scale(1.03);
+    }
+
+    .btn-inspect {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      margin-bottom: 12px;
+    }
+
+    .btn-inspect:hover {
+      background: var(--card-bg-hover);
+      border-color: var(--primary);
+    }
+
+    /* Modal / Drawer details (slides from right) */
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .drawer-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -550px;
+      width: 100%;
+      max-width: 500px;
+      height: 100vh;
+      background: var(--modal-bg);
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+      z-index: 101;
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      transition: right 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      overflow-y: auto;
+      border-left: 1px solid var(--card-border);
+    }
+
+    .drawer.active {
+      right: 0;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .drawer-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .drawer-close:hover {
+      color: var(--danger);
+    }
+
+    .drawer h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .drawer-section {
+      margin-bottom: 25px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    body.light-mode .drawer-section {
+      background: rgba(0, 0, 0, 0.01);
+    }
+
+    .drawer-section-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .factor-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+    }
+
+    .factor-bullet {
+      width: 6px;
+      height: 6px;
+      background-color: var(--danger);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Spinner Animation */
+    .spinner {
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 2px solid #fff;
+      width: 18px;
+      height: 18px;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .btn.loading .spinner {
+      display: inline-block;
+    }
+
+    .btn.loading .btn-text {
+      display: none;
+    }
+
+    /* Blank State CSS */
+    .no-pending-container {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 20px;
+      text-align: center;
+      color: var(--text-secondary);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+    }
+
+    .no-pending-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+      opacity: 0.7;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--modal-bg);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      padding: 12px 24px;
+      border-radius: 30px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-weight: 500;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="radial-glow"></div>
+  <div class="radial-glow-2"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">E</div>
+      <h1>Expense Dashboard</h1>
+    </div>
+    <button class="theme-toggle-btn" id="theme-toggle">
+      <span class="theme-toggle-icon">🌙</span>
+      <span class="theme-toggle-text">Dark Mode</span>
+    </button>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="dashboard-summary">
+      <div class="dashboard-title">
+        Pending Approvals 
+        <span class="pending-count-badge" id="pending-count">0</span>
+      </div>
+      <button class="refresh-btn" onclick="fetchPendingApprovals()">
+        🔄 Refresh
+      </button>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="cards-grid" id="cards-container">
+      <!-- Loading State -->
+      <div class="no-pending-container" id="loading-indicator">
+        <div class="no-pending-icon">⏳</div>
+        <h3>Fetching pending approvals from Vertex AI...</h3>
+      </div>
+    </div>
+  </main>
+
+  <!-- Drawer Details Modal -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+  <div class="drawer" id="details-drawer">
+    <div class="drawer-header">
+      <h2>Compliance Review</h2>
+      <button class="drawer-close" onclick="closeDrawer()">&times;</button>
+    </div>
+    
+    <div class="drawer-section">
+      <div class="drawer-section-title">Risk Assessment</div>
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px;">
+        <span style="font-size: 2.5rem; font-weight: 800; color: var(--danger);" id="drawer-risk-score">0</span>
+        <span style="color: var(--text-secondary); font-size: 1.1rem;">/ 10 Risk Score</span>
+      </div>
+      <div id="drawer-risk-badge" class="risk-badge" style="display: inline-flex; margin-bottom: 15px;">Low Risk</div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-title">Compliance Factors</div>
+      <div id="drawer-factors-list">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-title">Auditor Reasoning</div>
+      <p id="drawer-reasoning" style="color: var(--text-main); font-size: 0.95rem; line-height: 1.6;"></p>
+    </div>
+
+    <div class="drawer-section" style="border-left: 3px solid var(--primary);">
+      <div class="drawer-section-title">Raw Session Data</div>
+      <div style="font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; overflow-x: auto; color: var(--text-secondary);" id="drawer-session-id">
+        Session: 
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast-notify">Action processed successfully!</div>
+
+  <script>
+    // Theme Toggle Logic
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = themeToggleBtn.querySelector('.theme-toggle-icon');
+    const themeText = themeToggleBtn.querySelector('.theme-toggle-text');
+
+    // Default Theme (Load from local storage or check class)
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-mode');
+      themeIcon.textContent = '☀️';
+      themeText.textContent = 'Light Mode';
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      const isLightMode = document.body.classList.toggle('light-mode');
+      if (isLightMode) {
+        themeIcon.textContent = '☀️';
+        themeText.textContent = 'Light Mode';
+        localStorage.setItem('theme', 'light');
+      } else {
+        themeIcon.textContent = '🌙';
+        themeText.textContent = 'Dark Mode';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+
+    // Drawer Management
+    const overlay = document.getElementById('drawer-overlay');
+    const drawer = document.getElementById('details-drawer');
+
+    function openDrawer(pendingItem) {
+      document.getElementById('drawer-risk-score').textContent = pendingItem.risk_score;
+      document.getElementById('drawer-reasoning').textContent = pendingItem.reasoning;
+      document.getElementById('drawer-session-id').textContent = 'Session: ' + pendingItem.session_id;
+
+      // Set risk badge style in drawer
+      const badge = document.getElementById('drawer-risk-badge');
+      badge.className = 'risk-badge';
+      if (pendingItem.risk_score >= 8) {
+        badge.classList.add('risk-high');
+        badge.textContent = 'High Risk';
+      } else if (pendingItem.risk_score >= 4) {
+        badge.classList.add('risk-med');
+        badge.textContent = 'Medium Risk';
+      } else {
+        badge.classList.add('risk-low');
+        badge.textContent = 'Low Risk';
+      }
+
+      // Add compliance factors
+      const factorsList = document.getElementById('drawer-factors-list');
+      factorsList.innerHTML = '';
+      if (pendingItem.risk_factors && pendingItem.risk_factors.length > 0) {
+        pendingItem.risk_factors.forEach(factor => {
+          const div = document.createElement('div');
+          div.className = 'factor-item';
+          div.innerHTML = `<span class="factor-bullet"></span><span>${factor}</span>`;
+          factorsList.appendChild(div);
+        });
+      } else {
+        factorsList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.95rem;">No compliance flags raised.</p>';
+      }
+
+      overlay.classList.add('active');
+      drawer.classList.add('active');
+    }
+
+    function closeDrawer() {
+      overlay.classList.remove('active');
+      drawer.classList.remove('active');
+    }
+
+    // Toast Notification helper
+    function showToast(message) {
+      const toast = document.getElementById('toast-notify');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // API Integrations
+    let cachedPending = [];
+
+    async function fetchPendingApprovals() {
+      const container = document.getElementById('cards-container');
+      const countBadge = document.getElementById('pending-count');
+      
+      container.innerHTML = `
+        <div class="no-pending-container">
+          <div class="no-pending-icon">⏳</div>
+          <h3>Fetching pending approvals from Vertex AI...</h3>
+        </div>
+      `;
+
+      try {
+        const response = await fetch('/api/pending');
+        if (!response.ok) {
+          throw new Error('API fetch failed');
+        }
+        const data = await response.json();
+        cachedPending = data;
+        countBadge.textContent = data.length;
+        
+        container.innerHTML = '';
+
+        if (data.length === 0) {
+          container.innerHTML = `
+            <div class="no-pending-container">
+              <div class="no-pending-icon">🎉</div>
+              <h3>No pending approvals found!</h3>
+              <p>Everything has been fully processed.</p>
+            </div>
+          `;
+          return;
+        }
+
+        data.forEach((item, index) => {
+          const expense = item.expense || {};
+          const amountStr = expense.amount ? expense.amount.toFixed(2) : '0.00';
+          const submitter = expense.submitter || 'Unknown';
+          const category = expense.category || 'Other';
+          const description = expense.description || 'No description provided';
+          const date = expense.date || 'No date';
+          const score = item.risk_score || 0;
+
+          // Determine risk class
+          let riskClass = 'risk-low';
+          let riskText = 'Low Risk';
+          if (score >= 8) {
+            riskClass = 'risk-high';
+            riskText = 'High Risk';
+          } else if (score >= 4) {
+            riskClass = 'risk-med';
+            riskText = 'Medium Risk';
+          }
+
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.id = `card-${item.session_id}`;
+          card.innerHTML = `
+            <div>
+              <div class="card-top-header">
+                <span class="session-id-tag" title="${item.session_id}">${item.session_id}</span>
+                <span class="risk-badge ${riskClass}">${riskText} (Score: ${score})</span>
+              </div>
+              <div class="expense-amount">$${amountStr}</div>
+              <div class="expense-details">
+                <div class="detail-item">
+                  <span class="detail-label">Submitter</span>
+                  <span class="detail-value">${submitter}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Category</span>
+                  <span class="detail-value">${category}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Date</span>
+                  <span class="detail-value">${date}</span>
+                </div>
+                <div class="expense-description">${description}</div>
+              </div>
+            </div>
+            <div>
+              <button class="btn btn-inspect" onclick="inspectCard(${index})">
+                👁️ Inspect Compliance Review
+              </button>
+              <div class="action-section">
+                <button class="btn btn-approve" id="approve-${item.session_id}" onclick="processAction('${item.session_id}', true)">
+                  <span class="btn-text">Approve</span>
+                  <span class="spinner"></span>
+                </button>
+                <button class="btn btn-reject" id="reject-${item.session_id}" onclick="processAction('${item.session_id}', false)">
+                  <span class="btn-text">Reject</span>
+                  <span class="spinner"></span>
+                </button>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+      } catch (error) {
+        console.error(error);
+        container.innerHTML = `
+          <div class="no-pending-container" style="border-color: var(--danger);">
+            <div class="no-pending-icon" style="color: var(--danger);">⚠️</div>
+            <h3>Error loading pending approvals</h3>
+            <p>Make sure the backend is running and the AGENT_RUNTIME_ID environment variable is set.</p>
+          </div>
+        `;
+      }
+    }
+
+    function inspectCard(index) {
+      const item = cachedPending[index];
+      if (item) {
+        openDrawer(item);
+      }
+    }
+
+    async function processAction(sessionId, approve) {
+      const approveBtn = document.getElementById(`approve-${sessionId}`);
+      const rejectBtn = document.getElementById(`reject-${sessionId}`);
+      const card = document.getElementById(`card-${sessionId}`);
+      const countBadge = document.getElementById('pending-count');
+
+      // Add loading state
+      if (approve) {
+        approveBtn.classList.add('loading');
+        rejectBtn.disabled = true;
+      } else {
+        rejectBtn.classList.add('loading');
+        approveBtn.disabled = true;
+      }
+
+      try {
+        const response = await fetch(`/api/action/${sessionId}?approve=${approve}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Action failed');
+        }
+
+        const result = await response.json();
+        showToast(approve ? 'Expense successfully APPROVED!' : 'Expense successfully REJECTED!');
+
+        // Animate card removal
+        card.style.transition = 'all 0.5s ease';
+        card.style.transform = 'translateY(-20px)';
+        card.style.opacity = '0';
+        
+        setTimeout(() => {
+          card.remove();
+          // Update count
+          cachedPending = cachedPending.filter(item => item.session_id !== sessionId);
+          countBadge.textContent = cachedPending.length;
+          
+          if (cachedPending.length === 0) {
+            document.getElementById('cards-container').innerHTML = `
+              <div class="no-pending-container">
+                <div class="no-pending-icon">🎉</div>
+                <h3>No pending approvals found!</h3>
+                <p>Everything has been fully processed.</p>
+              </div>
+            `;
+          }
+        }, 500);
+
+      } catch (error) {
+        console.error(error);
+        showToast('Error: Failed to process action.');
+        
+        // Remove loading state on failure
+        approveBtn.classList.remove('loading');
+        rejectBtn.classList.remove('loading');
+        approveBtn.disabled = false;
+        rejectBtn.disabled = false;
+      }
+    }
+
+    // Initial Fetch
+    document.addEventListener('DOMContentLoaded', fetchPendingApprovals);
+  </script>
+</body>
+</html>
